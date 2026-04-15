@@ -3,7 +3,6 @@
 Este documento describe el diseño técnico alineado con la narrativa ([`NARRATIVA_PROBLEMA.md`](./NARRATIVA_PROBLEMA.md)) y los requerimientos ([`REQUERIMIENTOS_FUNCIONALES_Y_NO_FUNCIONALES.md`](./REQUERIMIENTOS_FUNCIONALES_Y_NO_FUNCIONALES.md)).
 
 ---
-
 ## 1. Visión general
 
 La solución sigue una **arquitectura cliente-servidor** en tres capas lógicas:
