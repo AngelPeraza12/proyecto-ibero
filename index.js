@@ -1,0 +1,61 @@
+const express = require('express');
+const cors = require('cors');
+const db = require('./db');
+
+const app = express();
+
+app.use(cors());
+
+app.use(express.json());
+
+//peticiones
+
+app.get('/docentes', (req, res) => {
+    const sql = 'SELECT * FROM docentes';
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            return res.status(500).json({error: 'error al obtener los docentes'});
+        }
+        res.json(results);
+    });
+});
+
+//consulta por id
+app.get('/docentes/:id', (req, res) => {
+
+    const {id} = req.params;
+
+    const sql = 'SELECT * FROM docentes WHERE id = ?';
+
+    db.query(sql, [id], (err, results) => {
+        if (err) {
+            return res.status(500).json({error: 'error al obtener el docentes'});
+        }
+        if (!results.length) {
+            return res.status(404).json({ error: 'Docente no encontrado'})
+        }
+        res.json(results[0]);
+    });
+});
+
+app.post('/docentes', (req, res) => {
+    const {nombre, correo, telefono, titulo, area_academica, dedicacion, anios_experiencia} = req.body;
+    // con .trim evito que almacene datos basura como los espacios en blanco
+    if (!nombre?.trim() || !correo?.trim() || !telefono?.trim() || !titulo?.trim() || !area_academica?.trim() || !dedicacion?.trim() || !anios_experiencia?.trim()) {
+        return res.status(400).json({error: 'Todos los campos son requeridos'});
+    }
+
+    const anios = Number(anios_experiencia);
+
+    if(Number.isNaN(anios) || anios < 0) {
+        return res.status(400).json({ error: 'anios de experiencia invalido'});
+    };
+
+    const sql = 'INSERT INTO docentes (nombre, correo, telefono, titulo, area_academica, dedicacion, anios_experiencia) VALUES (?,?,?,?,?,?)';
+    
+    
+    
+});
+
+
