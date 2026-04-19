@@ -92,12 +92,26 @@ app.put('/docentes/:id', (req, res) => {
 
     db.query(sql, [nombre.trim(), correo.trim(), telefono.trim(), titulo.trim(), area_academica.trim(), dedicacion.trim(), anios, id], (err) => {
         if(err){
-            return res.status(500).json({error: 'al actualizar docente'});
+            return res.status(500).json({error: 'Error al actualizar docente'});
         }
         return res.json({message: 'Docente actualizado'});
     });
-    
-    
-    
-})
+});
 
+app.delete('/docentes/:id', (req, res) => {
+    const { id } = req.params;
+   
+    const sql = 'DELETE docentes WHERE id=?';
+
+    db.query(sql, [id], (err) => {
+        if(err){
+            return res.status(500).json({error: 'error al eliminar el docente'});
+        }
+        return res.json({message: 'Docente Eliminado'});
+    });
+});
+
+app.listen(3001, () => {
+    console.log('Servidor backend corriendo en el puerto 3001')
+    
+});
