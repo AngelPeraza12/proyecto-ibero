@@ -40,19 +40,20 @@ app.get('/docentes/:id', (req, res) => {
 });
 
 app.post('/docentes', (req, res) => {
+    console.log("Datos recibidos en el servidor:", req.body);
     const {nombre, correo, telefono, titulo, area_academica, dedicacion, anios_experiencia} = req.body;
     // con .trim evito que almacene datos basura como los espacios en blanco
-    if (!nombre?.trim() || !correo?.trim() || !telefono?.trim() || !titulo?.trim() || !area_academica?.trim() || !dedicacion?.trim() || !anios_experiencia?.trim()) {
+    if (!nombre?.trim() || !correo?.trim() || !telefono?.trim() || !titulo?.trim() || !area_academica?.trim() || !dedicacion?.trim()) {
         return res.status(400).json({error: 'Todos los campos son requeridos'});
     }
 
     const anios = Number(anios_experiencia);
 
-    if(Number.isNaN(anios) || anios < 0) {
+    if(anios_experiencia === undefined || anios === null || Number.isNaN(anios) || anios < 0 ) {
         return res.status(400).json({ error: 'anios de experiencia invalido'});
     };
 
-    const sql = 'INSERT INTO docentes (nombre, correo, telefono, titulo, area_academica, dedicacion, anios_experiencia) VALUES (?,?,?,?,?,?)';
+    const sql = 'INSERT INTO docentes (nombre, correo, telefono, titulo, area_academica, dedicacion, anios_experiencia) VALUES (?,?,?,?,?,?,?)';
 
     db.query(sql, [nombre.trim(), correo.trim(), telefono.trim(), titulo.trim(), area_academica.trim(), dedicacion.trim(), anios], (err, result) => {
         if(err){
@@ -60,7 +61,7 @@ app.post('/docentes', (req, res) => {
         }
 
         res.json({
-            id: result.inserId,
+            id: result.insertId,
             nombre: nombre.trim(),
             correo: correo.trim(), 
             telefono: telefono.trim(), 
@@ -78,17 +79,17 @@ app.put('/docentes/:id', (req, res) => {
     const { id } = req.params;
     const {nombre, correo, telefono, titulo, area_academica, dedicacion, anios_experiencia} = req.body;
 
-    if (!nombre?.trim() || !correo?.trim() || !telefono?.trim() || !titulo?.trim() || !area_academica?.trim() || !dedicacion?.trim() || !anios_experiencia?.trim()) {
+    if (!nombre?.trim() || !correo?.trim() || !telefono?.trim() || !titulo?.trim() || !area_academica?.trim() || !dedicacion?.trim()) {
         return res.status(400).json({error: 'Todos los campos son requeridos'});
     }
 
     const anios = Number(anios_experiencia);
 
-    if(Number.isNaN(anios) || anios < 0) {
+    if(anios_experiencia === undefined || anios === null || Number.isNaN(anios) || anios < 0 ) {
         return res.status(400).json({ error: 'anios de experiencia invalido'});
     };
 
-    const sql = 'UPDATE docentes SET nombre=?, correo=?, telefono=?, titulo=?, area_academica=?, dedicacion=?, anios_experiencia WHERE id=?';
+    const sql = 'UPDATE docentes SET nombre=?, correo=?, telefono=?, titulo=?, area_academica=?, dedicacion=?, anios_experiencia=? WHERE id=?';
 
     db.query(sql, [nombre.trim(), correo.trim(), telefono.trim(), titulo.trim(), area_academica.trim(), dedicacion.trim(), anios, id], (err) => {
         if(err){
@@ -101,7 +102,7 @@ app.put('/docentes/:id', (req, res) => {
 app.delete('/docentes/:id', (req, res) => {
     const { id } = req.params;
    
-    const sql = 'DELETE docentes WHERE id=?';
+    const sql = 'DELETE FROM docentes WHERE id=?';
 
     db.query(sql, [id], (err) => {
         if(err){
