@@ -144,12 +144,39 @@ function App() {
     {/* Formulario */}
     <form onSubmit={registrarDatos}>
   <div className="form-container">
-    <input type="text" placeholder="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
-    <input type="email" placeholder="Correo" value={correo} onChange={(e) => setCorreo(e.target.value)} required />
-    <input type="text" placeholder="Teléfono" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
-    <input type="text" placeholder="Título" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
-    <input type="text" placeholder="Área Académica" value={areaAcademica} onChange={(e) => setAreaAcademica(e.target.value)} />
-    <input type="text" placeholder="Dedicación" value={dedicacion} onChange={(e) => setDedicacion(e.target.value)} />
+    <input type="text" placeholder="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} required maxLength="100" />
+    <input type="email" placeholder="Correo" value={correo} onChange={(e) => setCorreo(e.target.value)} required maxLength="100"/>
+    <input type="tel" placeholder="Teléfono" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
+    <input type="text" placeholder="Título" value={titulo} onChange={(e) => setTitulo(e.target.value)} required maxLength="100" />
+      <select 
+      value={areaAcademica} 
+      onChange={(e) => setAreaAcademica(e.target.value)}
+      required
+    >
+      <option value="" disabled>Seleccione Área Académica</option>
+      <option value="Administración y Negocios">Administración y Negocios</option>
+      <option value="Artes y Humanidades">Artes y Humanidades</option>
+      <option value="Ciencias Biológicas y Salud">Ciencias Biológicas y Salud</option>
+      <option value="Ciencias Exactas y Naturales">Ciencias Exactas y Naturales</option>
+      <option value="Ciencias Sociales">Ciencias Sociales</option>
+      <option value="Contaduría y Finanzas">Contaduría y Finanzas</option>
+      <option value="Derecho y Leyes">Derecho y Leyes</option>
+      <option value="Educación y Pedagogía">Educación y Pedagogía</option>
+      <option value="Ingeniería y Tecnología">Ingeniería y Tecnología</option>
+      <option value="Psicología y Bienestar">Psicología y Bienestar</option>
+    </select>
+    <select 
+  value={dedicacion} 
+  onChange={(e) => setDedicacion(e.target.value)}
+  required
+>
+  <option value="" disabled>Seleccione Dedicación</option>
+  <option value="Tiempo Completo">Tiempo Completo</option>
+  <option value="Medio Tiempo">Medio Tiempo</option>
+  <option value="Cátedra">Cátedra</option>
+  <option value="Investigador">Investigador</option>
+  <option value="Honorarios">Honorarios</option>
+</select>
     <input 
   type="number" 
   placeholder="Años de experiencia" 
