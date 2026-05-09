@@ -1,60 +1,84 @@
 import React from 'react';
+import { formatSoloNumeros } from '../utils/validaciones';
 
 const DocenteForm = ({ formData, setFormData, onSubmit, editIndex }) => {
   
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
-    // Mantenemos la transformación a MAYÚSCULAS en el estado interno
-    // para que el usuario vea lo que se guardará, o puedes quitar el .toUpperCase()
-    // aquí si prefieres que vea minúsculas mientras escribe.
-    const finalValue = (type === 'text' || name === 'titulo') ? value.toUpperCase() : value;
-    setFormData({ ...formData, [name]: finalValue });
-  };
+    const { name, value } = e.target;
+    let finalValue = value;
 
-  const handleTelefonoChange = (e) => {
-    const val = e.target.value.replace(/\D/g, '').slice(0, 10);
-    setFormData({ ...formData, telefono: val });
+    // 1. Lógica para campos que SIEMPRE deben ser Mayúsculas (Nombre y Título)
+    if (name === 'nombre' || name === 'titulo') {
+      finalValue = value.toUpperCase();
+    }
+
+    // 2. Lógica para el correo (SIEMPRE minúsculas para evitar errores de login/envío)
+    if (name === 'correo') {
+      finalValue = value.toLowerCase();
+    }
+
+    // 3. Lógica para números (Teléfono y Años de Experiencia)
+    if (name === 'telefono') {
+      finalValue = formatSoloNumeros(value); // Usa tu función de utils
+    }
+
+    if (name === 'aniosExperiencia') {
+      // Solo permite números y evita valores negativos o extremadamente largos
+      finalValue = value.replace(/\D/g, '').slice(0, 2); 
+    }
+
+    setFormData({ ...formData, [name]: finalValue });
   };
 
   return (
     <form onSubmit={onSubmit}>
       <div className="form-container">
-        {/* Usamos Placeholders en estilo Nombre Propio */}
-        <input name="nombre" type="text" placeholder="Nombre completo" value={formData.nombre} onChange={handleChange} required maxLength="100" />
+        {/* Nombre: Forzado a Mayúsculas por handleChange */}
+        <input name="nombre" type="text" placeholder="NOMBRE COMPLETO" value={formData.nombre} onChange={handleChange} required maxLength="100" />
         
-        <input name="correo" type="email" placeholder="Correo electrónico" value={formData.correo} onChange={handleChange} required maxLength="100" />
+        {/* Correo: Forzado a Minúsculas */}
+        <input name="correo" type="email" placeholder="correo@ejemplo.com" value={formData.correo} onChange={handleChange} required maxLength="100" />
         
-        <input name="telefono" type="tel" placeholder="Teléfono (10 dígitos)" value={formData.telefono} onChange={handleTelefonoChange} />
+        {/* Teléfono: Solo números y máx 10 */}
+        <input name="telefono" type="tel" placeholder="TELÉFONO (10 DÍGITOS)" value={formData.telefono} onChange={handleChange} />
         
-        <input name="titulo" type="text" placeholder="Título profesional" value={formData.titulo} onChange={handleChange} required maxLength="100" />
+        {/* Título: Forzado a Mayúsculas */}
+        <input name="titulo" type="text" placeholder="TÍTULO PROFESIONAL" value={formData.titulo} onChange={handleChange} required maxLength="100" />
         
         <select name="areaAcademica" value={formData.areaAcademica} onChange={handleChange} required>
-          <option value="" disabled>Seleccione área académica</option>
-          <option value="ADMINISTRACIÓN Y NEGOCIOS">Administración y Negocios</option>
-          <option value="ARTES Y HUMANIDADES">Artes y Humanidades</option>
-          <option value="CIENCIAS BIOLÓGICAS Y SALUD">Ciencias Biológicas y Salud</option>
-          <option value="CIENCIAS EXACTAS Y NATURALES">Ciencias Exactas y Naturales</option>
-          <option value="CIENCIAS SOCIALES">Ciencias Sociales</option>
-          <option value="CONTADURÍA Y FINANZAS">Contaduría y Finanzas</option>
-          <option value="DERECHO Y LEYES">Derecho y Leyes</option>
-          <option value="EDUCACIÓN Y PEDAGOGÍA">Educación y Pedagogía</option>
-          <option value="INGENIERÍA Y TECNOLOGÍA">Ingeniería y Tecnología</option>
-          <option value="PSICOLOGÍA Y BIENESTAR">Psicología y Bienestar</option>
+          <option value="" disabled>SELECCIONE ÁREA ACADÉMICA</option>
+          <option value="ADMINISTRACIÓN Y NEGOCIOS">ADMINISTRACIÓN Y NEGOCIOS</option>
+          <option value="ARTES Y HUMANIDADES">ARTES Y HUMANIDADES</option>
+          <option value="CIENCIAS BIOLÓGICAS Y SALUD">CIENCIAS BIOLÓGICAS Y SALUD</option>
+          <option value="CIENCIAS EXACTAS Y NATURALES">CIENCIAS EXACTAS Y NATURALES</option>
+          <option value="CIENCIAS SOCIALES">CIENCIAS SOCIALES</option>
+          <option value="CONTADURÍA Y FINANZAS">CONTADURÍA Y FINANZAS</option>
+          <option value="DERECHO Y LEYES">DERECHO Y LEYES</option>
+          <option value="EDUCACIÓN Y PEDAGOGÍA">EDUCACIÓN Y PEDAGOGÍA</option>
+          <option value="INGENIERÍA Y TECNOLOGÍA">INGENIERÍA Y TECNOLOGÍA</option>
+          <option value="PSICOLOGÍA Y BIENESTAR">PSICOLOGÍA Y BIENESTAR</option>
         </select>
 
         <select name="dedicacion" value={formData.dedicacion} onChange={handleChange} required>
-          <option value="" disabled>Seleccione dedicación</option>
-          <option value="TIEMPO COMPLETO">Tiempo completo</option>
-          <option value="MEDIO TIEMPO">Medio tiempo</option>
-          <option value="CÁTEDRA">Cátedra</option>
-          <option value="INVESTIGADOR">Investigador</option>
-          <option value="HONORARIOS">Honorarios</option>
+          <option value="" disabled>SELECCIONE DEDICACIÓN</option>
+          <option value="TIEMPO COMPLETO">TIEMPO COMPLETO</option>
+          <option value="MEDIO TIEMPO">MEDIO TIEMPO</option>
+          <option value="CÁTEDRA">CÁTEDRA</option>
+          <option value="INVESTIGADOR">INVESTIGADOR</option>
+          <option value="HONORARIOS">HONORARIOS</option>
         </select>
 
-        <input name="aniosExperiencia" type="number" placeholder="Años de experiencia" value={formData.aniosExperiencia === 0 ? '' : formData.aniosExperiencia} onChange={handleChange} />
+        {/* Años Experiencia: Cambiado a type="text" para controlar mejor la entrada de solo números */}
+        <input 
+          name="aniosExperiencia" 
+          type="text" 
+          placeholder="AÑOS DE EXPERIENCIA" 
+          value={formData.aniosExperiencia === 0 ? '' : formData.aniosExperiencia} 
+          onChange={handleChange} 
+        />
         
         <button type="submit" className="btn-guardar">
-          {editIndex !== null ? 'Actualizar docente' : 'Guardar docente'}
+          {editIndex !== null ? 'ACTUALIZAR DOCENTE' : 'GUARDAR DOCENTE'}
         </button>
       </div>
     </form>

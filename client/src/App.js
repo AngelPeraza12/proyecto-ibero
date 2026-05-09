@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import './App.css';
 import DocenteForm from './components/DocenteForm';
 import DocenteTable from './components/DocenteTable';
 import { docenteService } from './services/docenteService';
-import { validateTelefono } from './utils/validaciones';
+import { validateEmail, validateSoloLetras, validateTelefono} from './utils/validaciones';
 
 function App() {
   const [registros, setRegistros] = useState([]);
@@ -27,16 +28,40 @@ function App() {
   const registrarDatos = async (e) => {
     e.preventDefault();
     
-    // Si el teléfono tiene algo escrito y NO cumple con la regla de 6-10 dígitos
+    // 1. Validación de campos obligatorios
+    if (!formData.nombre || !formData.correo || !formData.areaAcademica) {
+      alert("Por favor completa todos los campos obligatorio - nombre correo y area");
+      return;
+    }
+
+    // 2. Validación de Nombre (Solo letras)
+    if (!validateSoloLetras(formData.nombre)) {
+      alert('El nombre solo debe contener letras.');
+      return;
+    }
+
+    // 3. Validación de Correo
+    if (!validateEmail(formData.correo)) {
+      alert('Por favor, ingresa un correo electrónico válido.');
+      return;
+    }
+
+    // 4. Validación de Teléfono
     if (formData.telefono && !validateTelefono(formData.telefono)) {
       alert('El teléfono debe tener entre 6 y 10 dígitos.');
-      return; // Este "return" es clave: detiene la función y no deja que siga al fetch
-    };
+      return;
+    }
+
+    // 5. Validación de Años de Experiencia (No negativos)
+    if (parseInt(formData.aniosExperiencia) < 0) {
+      alert('Los años de experiencia no pueden ser negativos.');
+      return;
+    }
 
     // Convertir a MAYÚSCULAS antes de enviar
     const payload = {
       nombre: formData.nombre.toUpperCase().trim(),
-      correo: formData.correo,
+      correo: formData.correo.toLocaleLowerCase().trim(),
       telefono: formData.telefono,
       titulo: formData.titulo.toUpperCase().trim(),
       area_academica: formData.areaAcademica,
@@ -50,10 +75,15 @@ function App() {
         : await docenteService.create(payload);
 
       if (res.ok) {
-        alert(editIndex !== null ? 'Docente actualizado' : 'Docente guardado');
-        setEditIndex(null);
-        setFormData({ nombre: '', correo: '', telefono: '', titulo: '', areaAcademica: '', dedicacion: '', aniosExperiencia: 0 });
-        cargarDocentes();
+        Swal.fire({
+          title: editIndex !== null ? '¡Actualizado!' : '¡Guardado!',
+          text: editIndex !== null ? 'Docente actualizado con éxito' : 'Docente registrado correctamente',
+          icon: 'success',
+          confirmButtonColor: '#3085d6',
+          background: '#1a1a1a', // Para que combine con tu fondo oscuro
+          color: '#fff'
+        });
+        // ... resto de tu lógica (limpiar form, cargar docentes)
       }
     } catch (error) { alert('Error en el servidor'); }
   };
@@ -70,19 +100,44 @@ function App() {
       aniosExperiencia: reg.anios_experiencia
     });
     setEditIndex(idx);
+
+    // ESTO ENVÍA AL USUARIO AL INICIO DE LA PÁGINA
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth' // 'smooth' hace que el movimiento sea animado y no un salto brusco
+    });
   };
 
   const eliminarRegistro = async (idx) => {
-    const confirmacion = window.confirm("¿Estás seguro de que deseas eliminar este docente? Esta acción no se puede deshacer.");
-    if (!confirmacion) return;
-
-    try {
-      const res = await docenteService.delete(registros[idx].id);
-      if (res.ok) {
-        alert('Eliminado correctamente');
-        cargarDocentes();
+    Swal.fire({
+      title: '¿Estás seguro, Quieres eliminar?',
+      text: "Esta acción no se puede deshacer.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      background: '#1a1a1a',
+      color: '#fff'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await docenteService.delete(registros[idx].id);
+          if (res.ok) {
+            Swal.fire({
+              title: '¡Eliminado!',
+              icon: 'success',
+              background: '#1a1a1a',
+              color: '#fff'
+            });
+            cargarDocentes();
+          }
+        } catch (error) {
+          Swal.fire('Error', 'No se pudo eliminar el registro', 'error');
+        }
       }
-    } catch (error) { alert('Error al eliminar'); }
+    });
   };
 
   return (
